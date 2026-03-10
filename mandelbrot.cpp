@@ -2,10 +2,10 @@
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 
-#define ESCAPE 100000.0
+#define ESCAPE 3.0
 #define MAX_ITERATIONS 100
 #define POWER 2
-#define STEPS 1000
+#define STEPS 2020
 
 struct complex {
   double r;
@@ -39,13 +39,13 @@ complex add(complex z, complex c){
 
 // ignor root
 double qudratic_abs(complex z){
-  return z.r * z.r - z.i * z.i;
+  return z.r * z.r + z.i * z.i;
 }
 
 size_t calculatePixel(double x, double y){
   complex c {x, y};
   complex z {0, 0};
-  size_t counter = 0;
+  size_t counter = 1;
   
   for(counter = 1; counter < MAX_ITERATIONS; counter++){
     z = power(z);
@@ -66,9 +66,9 @@ void calculate_y_vector(size_t* map, double* y_vector, double x, int x_idx){
 
 // the map should be defined as double array of type double and size [range][range]
 void calculateMandelbrot(size_t* map, double range){
-  double x_array[STEPS];
-  double y_array[STEPS];
-  double step = range/STEPS;
+  double * x_array = new double[STEPS];
+  double * y_array = new double[STEPS];
+  double step = range/(STEPS-1);
   for(int i = 0; i < STEPS; i++){
     x_array[i] = -(range/2) + step * i;
     y_array[i] = -(range/2) + step * i;
@@ -77,6 +77,8 @@ void calculateMandelbrot(size_t* map, double range){
     calculate_y_vector(map, y_array, x_array[x_idx], x_idx);
     //printf("Vector %d done.\n", x_idx);
   }
+  delete(x_array);
+  delete(y_array);
   return;
 }
 
@@ -151,7 +153,6 @@ void visualizeMandelbrotInWindow(size_t* map){
       image.setPixel(x_idx, y_idx, configureColorInWindow(map[x_idx * STEPS + y_idx]));
     }
   }
-  
   sf::Texture texture;
   texture.loadFromImage(image);
   sf::Sprite sprite(texture);
@@ -160,8 +161,6 @@ void visualizeMandelbrotInWindow(size_t* map){
     while(window.pollEvent(event)){
       if(event.type == sf::Event::Closed){
         window.close();
-      }else {
-        printf("Event type: %d\n", event.type);
       }
     }
     window.clear();
@@ -175,8 +174,12 @@ void visualizeMandelbrotInWindow(size_t* map){
 // color is defined by how many iterations are necessary until escape point is reached
 // calculate range -2 to 2 for real and imaginary part
 int main(){
-  size_t result[STEPS][STEPS];
-  calculateMandelbrot((size_t *) &result, 3);
-  visualizeMandelbrotInWindow((size_t *) &result);
+  size_t * result = new size_t[STEPS * STEPS];
+  printf("Memory was allocated\n");
+  calculateMandelbrot((size_t *) result, 4);
+  printf("Calculation complete\n");
+  visualizeMandelbrotInWindow((size_t *) result);
+  printf("Visualization complete\n");
+  delete(result);
   return 0;
 }
