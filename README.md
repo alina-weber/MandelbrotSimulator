@@ -7,6 +7,6 @@ Apart from the standard library I use a library for the visualization which is `
 
 I currently compile it with GCC/G++ version 15, but older versions should work as well.
 The compilation command is just:
-`g++ main.cpp -lsfml-graphics -lsfml-window -lsfml-system`
+`g++ mandelbrot.cpp -lsfml-graphics -lsfml-window -lsfml-system`
 
 When the project and compilation gets more complex I will also add a cmake file etc.
