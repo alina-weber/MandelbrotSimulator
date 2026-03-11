@@ -5,8 +5,8 @@ So far I am building this on Ubuntu 22.04 and 24.04, so the used libraries might
 Apart from the standard library I use a library for the visualization which is `libsfml-dev`. It can be installed on Ubuntu via:
 `$ sudo apt install libsfml-dev`
 
-I currently compile it with GCC/G++ version 15, but older versions should work as well.
-The compilation command is just:
-`g++ mandelbrot.cpp -lsfml-graphics -lsfml-window -lsfml-system`
+If you do not have this library you can also use the visualization in the terminal. Each two spaces will be one pixel of the graphic.
 
-When the project and compilation gets more complex I will also add a cmake file etc.
+
+
+
