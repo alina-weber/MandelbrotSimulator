@@ -10,7 +10,7 @@
 
 #endif //MANDELBROT_VISUALIZER_HPP
 
-void visualizeMandelbrotTerminal(size_t*);
+void visualizeMandelbrotTerminal(size_t *);
 
 class Viewer {
 public:
@@ -19,9 +19,10 @@ public:
     sf::Texture texture;
     sf::Sprite sprite;
     sf::Event event;
-    Viewer() : window(sf::VideoMode(STEPS, STEPS), "Mandelbrot"), event(){
+
+    Viewer() : window(sf::VideoMode(STEPS, STEPS), "Mandelbrot"), event() {
         image.create(STEPS, STEPS);
     }
 };
 
-void visualizeMandelbrotWindow(size_t*, Viewer&);
+void visualizeMandelbrotWindow(size_t *, Viewer &);

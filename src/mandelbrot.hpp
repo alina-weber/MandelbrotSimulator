@@ -3,7 +3,7 @@
 #include <thread>
 
 // define global parameters for mandelbrot calculation
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 200
 #define STEPS 2000
 #define ESCAPE 4.0
 #pragma once
