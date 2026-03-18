@@ -1,10 +1,12 @@
 #include <cstdio>
 #include <cstdint>
 #include <thread>
+#include <CL/cl.h>
 
 // define global parameters for mandelbrot calculation
-#define MAX_ITERATIONS 200
-#define STEPS 2000
+#define MAX_ITERATIONS 400
+#define WIDTH 2000
+#define HEIGHT 1300
 #define ESCAPE 4.0
 #pragma once
 namespace mandelbrot {
@@ -36,7 +38,7 @@ namespace mandelbrot {
         complex operator^(const uint32_t exponent) const {
             complex result(1, 0);
             complex base = *this;
-            for(int i = 0; i < exponent; i++){
+            for(uint32_t e = 0; e < exponent; e++){
                 const complex tmp = result;
                 result.r = tmp.r * base.r - tmp.i * base.i;
                 result.i = tmp.r * base.i + tmp.i * base.r;

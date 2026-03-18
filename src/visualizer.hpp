@@ -20,9 +20,10 @@ public:
     sf::Sprite sprite;
     sf::Event event;
 
-    Viewer() : window(sf::VideoMode(STEPS, STEPS), "Mandelbrot"), event() {
-        image.create(STEPS, STEPS);
+    Viewer() : window(sf::VideoMode(WIDTH, HEIGHT), "Mandelbrot"), event() {
+        image.create(WIDTH, HEIGHT);
     }
 };
-
+void draw_image(size_t * map, sf::Image& image);
+void move_curser_to_start();
 void visualizeMandelbrotWindow(size_t *, Viewer &);
