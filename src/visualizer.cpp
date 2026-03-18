@@ -175,9 +175,9 @@ sf::Color configureColorInWindow(size_t color) {
 }
 
 void draw_image(size_t * map, sf::Image& image) {
-    for (int x_idx = 0; x_idx < WIDTH; x_idx++) {
-        for (int y_idx = 0; y_idx < HEIGHT; y_idx++) {
-            image.setPixel(x_idx, y_idx, configureColorInWindow(map[x_idx * HEIGHT + y_idx]));
+    for (int y_idx = 0; y_idx < HEIGHT; y_idx++) {
+        for (int x_idx = 0; x_idx < WIDTH; x_idx++) {
+            image.setPixel(x_idx, y_idx, configureColorInWindow(map[y_idx * WIDTH + x_idx]));
         }
     }
 }

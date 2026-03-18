@@ -20,32 +20,32 @@ namespace mandelbrot {
         return 0;
     }
 
-    void calculatePixel_for_threads(size_t *map, double *y_vector, double x, size_t x_idx, size_t y_idx) {
-        for (size_t i = 0; i < HEIGHT/WORKERS && y_idx + i < HEIGHT; i++) {
-            map[HEIGHT * x_idx + y_idx + i] = calculatePixel(x, y_vector[y_idx + i]);
+    void calculatePixel_for_threads(size_t *map, double *x_vector, double y, size_t y_idx, size_t x_idx) {
+        for (size_t i = 0; i < WIDTH/WORKERS && x_idx + i < WIDTH; i++) {
+            map[WIDTH * y_idx + x_idx + i] = calculatePixel(x_vector[x_idx + i], y);
         }
     }
 
-    void calculate_y_vector(size_t *map, double *y_vector, double x, int x_idx) {
-        for (int y_idx = 0; y_idx < HEIGHT; y_idx++) {
-            map[HEIGHT * x_idx + y_idx] = calculatePixel(x, y_vector[y_idx]);
+    void calculate_x_vector(size_t *map, double *x_vector, double y, int y_idx) {
+        for (int x_idx = 0; x_idx < WIDTH; x_idx++) {
+            map[WIDTH * y_idx + x_idx] = calculatePixel(x_vector[x_idx], y);
         }
     }
 
     // Thread creation is too expensive for this to be efficient
-    void calculate_y_vector_threaded(size_t *map, double *y_vector, double x, int x_idx) {
+    void calculate_x_vector_threaded(size_t *map, double *x_vector, double y, int y_idx) {
         std::array<std::thread, WORKERS> workers;
-        int y_idx = 0;
-        if ( HEIGHT % WORKERS != 0) {
+        int x_idx = 0;
+        if ( WIDTH % WORKERS != 0) {
             printf("STEPS not dividable by WORKERS. Threaded implementation does not support this. Switch to regular implementation.");
-            calculate_y_vector(map, y_vector, x_idx, x_idx);
+            calculate_x_vector(map, x_vector, y, y_idx);
             return;
         }
-        while (y_idx < HEIGHT ) {
-            for (int worker_idx = 0; worker_idx < WORKERS && y_idx < HEIGHT; worker_idx++) {
+        while (x_idx < WIDTH ) {
+            for (int worker_idx = 0; worker_idx < WORKERS && x_idx < WIDTH; worker_idx++) {
                 workers[worker_idx] = std::thread(calculatePixel_for_threads,
-                    map, y_vector, x, x_idx, y_idx);
-                y_idx += HEIGHT / WORKERS;
+                    map, x_vector, y, y_idx, x_idx);
+                x_idx += WIDTH / WORKERS;
             }
 
             for (std::thread &worker: workers) {
@@ -57,29 +57,29 @@ namespace mandelbrot {
     }
 
     void fill_coordinates(double *x_array, double *y_array, double x, double y, double range) {
-        double step = range / (HEIGHT - 1);
+        double step = range / (WIDTH - 1);
         // fill coordinates
         for (int i = 0; i < WIDTH; i++) {
             x_array[i] = -(range / 2) + x + step * i;
         }
         for (int i = 0; i < HEIGHT; i++) {
-            y_array[i] = -(range / 2) + y + step * i;
+            y_array[i] = - (step * HEIGHT / 2) + y + step * i;
         }
     }
 
     void calculateMandelbrot(size_t *map, double *x_array, double *y_array, double x, double y, double range) {
         fill_coordinates(x_array, y_array, x, y, range);
-        for (int x_idx = 0; x_idx < WIDTH; x_idx++) {
-            calculate_y_vector(map, y_array, x_array[x_idx], x_idx);
+        for (int y_idx = 0; y_idx < HEIGHT; y_idx++) {
+            calculate_x_vector(map, x_array, y_array[y_idx], y_idx);
         }
     }
 
     void calculateMandelbrotThreaded(size_t *map, double *x_array, double *y_array, double x, double y, double range) {
-        std::array<std::thread, WIDTH> workers;
+        std::array<std::thread, HEIGHT> workers;
 
         fill_coordinates(x_array, y_array, x, y, range);
-        for (int x_idx = 0; x_idx < WIDTH; x_idx++) {
-            workers[x_idx] = std::thread(calculate_y_vector, map, y_array, x_array[x_idx], x_idx);
+        for (int y_idx = 0; y_idx < HEIGHT; y_idx++) {
+            workers[y_idx] = std::thread(calculate_x_vector, map, x_array, y_array[y_idx], y_idx);
         }
 
         for (std::thread &worker: workers) {

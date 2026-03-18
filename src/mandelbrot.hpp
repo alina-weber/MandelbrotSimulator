@@ -4,7 +4,7 @@
 #include <CL/cl.h>
 
 // define global parameters for mandelbrot calculation
-#define MAX_ITERATIONS 400
+#define MAX_ITERATIONS 100
 #define WIDTH 2000
 #define HEIGHT 1300
 #define ESCAPE 4.0

@@ -18,12 +18,12 @@ std::string loadKernel(const std::string& path)
 
 int main()
 {
-    const int width = 80;
-    const int height = 40;
+    const int width = 2000;
+    const int height = 1300;
     const int max_iter = 100;
 
-    const double xmin = -2.0;
-    const double ymin = -1.5;
+    const double xmin = 0.0;
+    const double ymin = 0.0;
     const double step = 3.0 / width;
 
     // -----------------------------
