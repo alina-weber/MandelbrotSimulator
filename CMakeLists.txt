@@ -13,9 +13,12 @@ find_package(OpenCL REQUIRED)
 # Add executable
 add_executable(Mandelbrot
     src/main.cpp
-    src/mandelbrot.cpp
+        src/mandelbrot.hpp
+        src/mandelbrot.cpp
     src/visualizer.cpp
     src/visualizer.hpp
+        src/mandelbrot_gpu.hpp
+        src/mandelbrot_gpu.cpp
 )
 
 # Include directories
@@ -35,7 +38,8 @@ target_include_directories(GPU_Test PRIVATE src include)
 target_link_libraries(GPU_Test PRIVATE sfml-graphics sfml-window sfml-system OpenCL::OpenCL )
 
 add_executable(GPU_Mandelbrot
-        src/test_kernel.cpp
+        src/mandelbrot_gpu.cpp
+        src/mandelbrot_gpu.hpp
 )
 
 # Include directories

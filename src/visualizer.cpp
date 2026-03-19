@@ -108,7 +108,7 @@ void move_curser_to_start() {
     fflush(stdout);
 }
 
-void visualizeMandelbrotTerminal(size_t *map) {
+void visualizeMandelbrotTerminal(uint16_t *map) {
     std::string buffer;
     buffer.reserve(WIDTH * HEIGHT* 16); // avoid reallocations
     for (int x_idx = 0; x_idx < WIDTH; x_idx++) {
@@ -174,7 +174,7 @@ sf::Color configureColorInWindow(size_t color) {
     }
 }
 
-void draw_image(size_t * map, sf::Image& image) {
+void draw_image(uint16_t *map, sf::Image& image) {
     for (int y_idx = 0; y_idx < HEIGHT; y_idx++) {
         for (int x_idx = 0; x_idx < WIDTH; x_idx++) {
             image.setPixel(x_idx, y_idx, configureColorInWindow(map[y_idx * WIDTH + x_idx]));
@@ -182,7 +182,7 @@ void draw_image(size_t * map, sf::Image& image) {
     }
 }
 
-void visualizeMandelbrotWindow(size_t *map, Viewer &viewer) {
+void visualizeMandelbrotWindow(uint16_t *map, Viewer &viewer) {
     draw_image(map, viewer.image);
     viewer.texture.loadFromImage(viewer.image);
     viewer.sprite = sf::Sprite(viewer.texture);

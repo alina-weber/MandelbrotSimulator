@@ -16,15 +16,12 @@ std::string loadKernel(const std::string& path)
         std::istreambuf_iterator<char>());
 }
 
-int main()
+int calculateMandelbrotGPU(uint16_t* map, double x, double y, double range, uint16_t max_iter, uint16_t width, uint16_t height)
 {
-    const int width = 2000;
-    const int height = 1300;
-    const int max_iter = 100;
 
-    const double xmin = 0.0;
-    const double ymin = 0.0;
-    const double step = 3.0 / width;
+    const double xmin = x - range /2.0;
+    const double step = range / (width-1);
+    const double ymin = y - step * (height / 2.0);
 
     // -----------------------------
     // 1. Get OpenCL platform
@@ -114,12 +111,11 @@ int main()
     // 5. Create output buffer
     // -----------------------------
 
-    std::vector<int> output(width * height);
 
     cl_mem outputBuffer = clCreateBuffer(
         context,
         CL_MEM_WRITE_ONLY,
-        output.size() * sizeof(int),
+        width * height * sizeof(uint16_t),
         nullptr,
         nullptr);
 
@@ -128,12 +124,12 @@ int main()
     // -----------------------------
 
     clSetKernelArg(kernel, 0, sizeof(cl_mem), &outputBuffer);
-    clSetKernelArg(kernel, 1, sizeof(int), &width);
-    clSetKernelArg(kernel, 2, sizeof(int), &height);
+    clSetKernelArg(kernel, 1, sizeof(uint16_t), &width);
+    clSetKernelArg(kernel, 2, sizeof(uint16_t), &height);
     clSetKernelArg(kernel, 3, sizeof(double), &xmin);
     clSetKernelArg(kernel, 4, sizeof(double), &ymin);
     clSetKernelArg(kernel, 5, sizeof(double), &step);
-    clSetKernelArg(kernel, 6, sizeof(int), &max_iter);
+    clSetKernelArg(kernel, 6, sizeof(uint16_t), &max_iter);
 
     // -----------------------------
     // 7. Launch kernel
@@ -141,7 +137,7 @@ int main()
 
     size_t globalSize[2] = {(size_t)width, (size_t)height};
 
-    clEnqueueNDRangeKernel(
+    cl_int err = clEnqueueNDRangeKernel(
         queue,
         kernel,
         2,
@@ -152,6 +148,9 @@ int main()
         nullptr,
         nullptr);
 
+    if (err != CL_SUCCESS) {
+        std::cout << "Kernel launch failed: " << err << "\n";
+    }
     clFinish(queue);
 
     // -----------------------------
@@ -163,29 +162,13 @@ int main()
         outputBuffer,
         CL_TRUE,
         0,
-        output.size() * sizeof(int),
-        output.data(),
+        width * height * sizeof(uint16_t),
+        map,
         0,
         nullptr,
         nullptr);
+    clFinish(queue);
 
-    // -----------------------------
-    // 9. ASCII preview
-    // -----------------------------
-
-    for(int y = 0; y < height; y++)
-    {
-        for(int x = 0; x < width; x++)
-        {
-            int v = output[y * width + x];
-
-            if(v == max_iter) std::cout << "#";
-            else if(v > 50) std::cout << "*";
-            else if(v > 10) std::cout << ".";
-            else std::cout << "-";
-        }
-        std::cout << "\n";
-    }
 
     // -----------------------------
     // Cleanup
@@ -199,3 +182,35 @@ int main()
 
     return 0;
 }
+
+// int main() {
+//     uint16_t width = 80;
+//     uint16_t height = 40;
+//     uint16_t max_iter = 100;
+//     auto *map = new uint16_t[width * height];
+//     double x = -0.5;
+//     double y = 0.0;
+//     double range = 3.0;
+//     calculateMandelbrotGPU(map, x, y, range, max_iter, width, height);
+//
+//
+//     // -----------------------------
+//     // 9. ASCII preview
+//     // -----------------------------
+//
+//     for(int y = 0; y < height; y++)
+//     {
+//         for(int x = 0; x < width; x++)
+//         {
+//             int v = map[y * width + x];
+//
+//             if(v == max_iter) std::cout << "#";
+//             else if(v > 50) std::cout << "*";
+//             else if(v > 10) std::cout << ".";
+//             else std::cout << "-";
+//         }
+//         std::cout << "\n";
+//     }
+//     delete[] map;
+//     return 0;
+// }

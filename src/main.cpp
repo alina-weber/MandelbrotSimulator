@@ -1,4 +1,5 @@
 #include "mandelbrot.hpp"
+#include "mandelbrot_gpu.hpp"
 #include "visualizer.hpp"
 #include <termios.h>
 #include <unistd.h>
@@ -9,7 +10,7 @@
 #include <string>
 
 
-void calculateAndSaveSimulation(size_t * map, double *x_array, double *y_array, double x, double y, double range) {
+void calculateAndSaveSimulation(uint16_t * map, double *x_array, double *y_array, double x, double y, double range) {
     //Viewer viewer;
     mandelbrot::calculateMandelbrotThreaded(map, x_array, y_array, x, y, range);
     //printf("Calculation finished\n");
@@ -20,7 +21,7 @@ void calculateAndSaveSimulation(size_t * map, double *x_array, double *y_array, 
     image.saveToFile("mandelbrot.png");
     printf("Image saved\n");
 }
-void window_visualization(size_t * map, double *x_array, double *y_array, double x, double y, double range) {
+void window_visualization(uint16_t * map, double *x_array, double *y_array, double x, double y, double range) {
     Viewer viewer;
     do {
         mandelbrot::calculateMandelbrotThreaded(map, x_array, y_array, x, y, range);
@@ -88,7 +89,7 @@ int readKey() {
     return -1;
 }
 
-void terminal_visualization(size_t * map, double *x_array, double *y_array, double x, double y, double range) {
+void terminal_visualization(uint16_t * map, double *x_array, double *y_array, double x, double y, double range) {
     int key = 1;
     setNonBlocking(true);
     do{
@@ -113,27 +114,59 @@ void terminal_visualization(size_t * map, double *x_array, double *y_array, doub
     } while (true);
 }
 
-// void calculate_mandelbrot_GPU(size_t * map, double *x_array, double *y_array, double x, double y, double range) {
-//     std::ifstream file("mandelbrot.cl");
-//     std::string source(
-//         std::istreambuf_iterator<char>(file),
-//         std::istreambuf_iterator<char>());
-//
-//     const char* src = source.c_str();
-//     cl_program program = clCreateProgramWithSource(context, 1, &src, nullptr, nullptr);
-//
-//     clBuildProgram(program, 0, nullptr, nullptr, nullptr, nullptr);
-//
-// }
+void calculate_mandelbrot_GPU(uint16_t * map, double *x_array, double *y_array, double x, double y, double range) {
+    Viewer viewer;
+    do {
+    calculateMandelbrotGPU(map, x, y, range, MAX_ITERATIONS, WIDTH, HEIGHT);
+        //printf("Calculation finished\n");
+        visualizeMandelbrotWindow(map, viewer);
+        if (viewer.event.type == sf::Event::MouseButtonPressed) {
+            if (viewer.event.mouseButton.button == sf::Mouse::Left) {
+                int mouseX = viewer.event.mouseButton.x;
+                int mouseY = viewer.event.mouseButton.y;
+                if (mouseX < 0 || mouseX >= WIDTH || mouseY < 0 || mouseY >= HEIGHT) {
+                    printf("Error occurred when reading mouse positions.\nMouseX: %d\nMouseY: %d", mouseX, mouseY);
+                } else {
+                    double step = range / (WIDTH - 1);
+                    x = x + mouseX * step - range / 2.0;
+                    y = y + (mouseY - HEIGHT / 2) * step;
+                }
+                printf("Range: %f\nX: %f\nY: %f\n", range, x, y);
+            }
+        } else if (viewer.event.type == sf::Event::MouseWheelScrolled) {
+            // negative/down is zooming out
+            double step = range / (WIDTH - 1);
+            double old_range = range;
+            double x_delta = viewer.event.mouseWheelScroll.x * step - range / 2.0;
+            //double x_delta = x_array[viewer.event.mouseWheelScroll.x] - x;
+            double y_delta = (viewer.event.mouseWheelScroll.y - HEIGHT / 2.0) * step;
+            //double y_delta = y_array[viewer.event.mouseWheelScroll.y] - y;
+            if (viewer.event.mouseWheelScroll.delta < 0) {
+                range = range * 2.0;
+                x_delta = x_delta * 2.0;
+                y_delta = y_delta * 2.0;
+            }
+            // positive/up is zooming in
+            else if (viewer.event.mouseWheelScroll.delta > 0) {
+                range = range / 2.0;
+                x_delta = x_delta / 2.0;
+                y_delta = y_delta / 2.0;
+            }
+            // x = x_array[viewer.event.mouseWheelScroll.x] - x_delta;
+            x = x + (viewer.event.mouseWheelScroll.x) * step - old_range / 2.0 - x_delta;
+            y = y + (viewer.event.mouseWheelScroll.y - HEIGHT / 2.0) * step - y_delta;
+        }
+    } while (viewer.window.isOpen());
+}
 
 int main() {
-    auto *map = new size_t[WIDTH * HEIGHT];
+    auto *map = new uint16_t[WIDTH * HEIGHT];
     double *x_array = new double[WIDTH];
     double *y_array = new double[HEIGHT];
     double x = -0.5;
     double y = 0.0;
     double range = 3.0;
-    window_visualization(map, x_array, y_array, x, y, range);
+    calculate_mandelbrot_GPU(map, x_array, y_array, x, y, range);
     delete[] map;
     delete[] x_array;
     delete[] y_array;

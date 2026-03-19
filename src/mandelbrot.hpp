@@ -4,7 +4,7 @@
 #include <CL/cl.h>
 
 // define global parameters for mandelbrot calculation
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 400
 #define WIDTH 2000
 #define HEIGHT 1300
 #define ESCAPE 4.0
@@ -62,7 +62,7 @@ namespace mandelbrot {
         }
     };
 
-    void calculateMandelbrot(size_t* map, double * x_array, double * y_array, double x, double y, double range);
+    void calculateMandelbrot(uint16_t* map, double * x_array, double * y_array, double x, double y, double range);
 
-    void calculateMandelbrotThreaded(size_t* map, double * x_array, double * y_array, double x, double y, double range);
+    void calculateMandelbrotThreaded(uint16_t* map, double * x_array, double * y_array, double x, double y, double range);
 }
