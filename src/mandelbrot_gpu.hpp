@@ -7,4 +7,5 @@
 
 #endif //MANDELBROT_MANDELBROT_GPU_HPP
 
-int calculateMandelbrotGPU(uint16_t* map, double x, double y, double range, uint16_t max_iter, uint16_t width, uint16_t height);
+int calculate_mandelbrot_GPU(uint16_t* map, double x, double y, double range, uint16_t max_iter, uint16_t width,
+    uint16_t height);

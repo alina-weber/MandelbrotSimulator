@@ -10,7 +10,7 @@
 
 #endif //MANDELBROT_VISUALIZER_HPP
 
-void visualizeMandelbrotTerminal(uint16_t *);
+void visualize_mandelbrot_terminal(uint16_t *);
 
 class Viewer {
 public:
@@ -26,4 +26,4 @@ public:
 };
 void draw_image(uint16_t * map, sf::Image& image);
 void move_curser_to_start();
-void visualizeMandelbrotWindow(uint16_t *, Viewer &);
+void visualize_mandelbrot_window(uint16_t *, Viewer &);

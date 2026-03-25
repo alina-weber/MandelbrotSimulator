@@ -62,7 +62,7 @@ namespace mandelbrot {
         }
     };
 
-    void calculateMandelbrot(uint16_t* map, double * x_array, double * y_array, double x, double y, double range);
+    void calculate_mandelbrot(uint16_t* map, double * x_array, double * y_array, double x, double y, double range, uint16_t width, uint16_t height, uint16_t max_iterations);
 
-    void calculateMandelbrotThreaded(uint16_t* map, double * x_array, double * y_array, double x, double y, double range);
+    void calculate_mandelbrot_threaded(uint16_t* map, double * x_array, double * y_array, double x, double y, double range, uint16_t width, uint16_t height, uint16_t max_iterations);
 }
